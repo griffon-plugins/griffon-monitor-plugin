@@ -1,0 +1,38 @@
+
+[[_introduction]]
+= Introduction
+
+This plugin exposes the Griffon Environment, application metadata and various managers through JMX beans.
+The application's name is used as a qualifier on the beans in order to avoid any conflicts with more than one
+application running within the same JVM process.
+
+The following list summarizes the types and their MBean names
+
+griffon.core.env.GriffonEnvironment::
+griffon.core:type=Environment,application=<applicationName>,name=griffon
+
+griffon.core.env.Metadata::
+griffon.core:type=Environment,application=<applicationName>,name=metadata
+
+griffon.core.addon.AddonManager::
+griffon.core:type=Manager,application=<applicationName>,name=addon
+
+griffon.core.artifact.ArtifactManager::
+griffon.core:type=Manager,application=<applicationName>,name=artifact
+
+griffon.core.mvc.MVCGroupManager::
+griffon.core:type=Manager,application=<applicationName>,name=mvc
+
+griffon.core.view.WindowManager::
+griffon.core:type=Manager,application=<applicationName>,name=window
+
+griffon.core.controller.ActionManager::
+griffon.core:type=Manager,application=<applicationName>,name=action
+
+griffon.core.threading.UIThreadManager::
+griffon.core:type=Manager,application=<applicationName>,name=thread
+
+Here's how these beans look when a example application is inspected using JConsole
+
+image::jconsole.png[]
+
