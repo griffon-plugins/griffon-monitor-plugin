@@ -1,0 +1,3 @@
+griffon.plugins.monitor
+griffon.util
+org.codehaus.griffon.runtime.monitor
