@@ -17,6 +17,7 @@ package org.codehaus.griffon.runtime.monitor;
 
 import griffon.core.addon.GriffonAddon;
 import griffon.core.injection.Module;
+import griffon.plugins.monitor.MBeanManager;
 import org.codehaus.griffon.runtime.core.injection.AbstractModule;
 import org.kordamp.jipsy.ServiceProviderFor;
 
@@ -31,6 +32,10 @@ public class MonitorModule extends AbstractModule {
     @Override
     protected void doConfigure() {
         // tag::bindings[]
+        bind(MBeanManager.class)
+            .to(DefaultMBeanManager.class)
+            .asSingleton();
+
         bind(GriffonAddon.class)
             .to(MonitorAddon.class)
             .asSingleton();

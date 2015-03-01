@@ -13,25 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.monitor;
-
-import griffon.core.controller.ActionManager;
-
-import javax.annotation.Nonnull;
+package org.codehaus.griffon.runtime.monitor;
 
 /**
  * @author Andres Almiray
  */
-public class ActionManagerMonitor implements ActionManagerMonitorMXBean {
-    private final ActionManager delegate;
+public interface AddonManagerMonitorMXBean {
+    String getManagerImplementationClass();
 
-    public ActionManagerMonitor(@Nonnull ActionManager delegate) {
-        this.delegate = delegate;
-    }
+    int getAddonCount();
 
-    @Override
-    public String getManagerImplementationClass() {
-        return delegate.getClass().getName();
-    }
-
+    GriffonAddonInfo[] getAddonDetails();
 }

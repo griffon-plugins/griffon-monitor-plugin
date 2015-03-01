@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.monitor;
+package org.codehaus.griffon.runtime.monitor;
 
 /**
  * @author Andres Almiray
  */
-public interface MetadataMonitorMXBean {
-    String getApplicationName();
+public interface ObjectStorageMonitorMXBean {
+    String getStorageImplementationClass();
 
-    String getApplicationVersion();
+    int getObjectCount();
 
-    String getRunningEnvironment();
+    String[] getKeys();
 }

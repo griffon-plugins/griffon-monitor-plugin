@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.monitor;
+package org.codehaus.griffon.runtime.monitor;
 
 import griffon.core.env.GriffonEnvironment;
+import griffon.core.env.Metadata;
+
+import javax.annotation.Nonnull;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 /**
  * @author Andres Almiray
  */
-public class EnvironmentMonitor implements EnvironmentMonitorMXBean {
+public class EnvironmentMonitor extends AbstractMBeanRegistration implements EnvironmentMonitorMXBean {
+    public EnvironmentMonitor(@Nonnull Metadata metadata) {
+        super(metadata);
+    }
+
     @Override
     public String getBuildDate() {
         return GriffonEnvironment.getBuildDate();
@@ -49,5 +58,10 @@ public class EnvironmentMonitor implements EnvironmentMonitorMXBean {
     @Override
     public String getOsVersion() {
         return GriffonEnvironment.getOsVersion();
+    }
+
+    @Override
+    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
+        return new ObjectName("griffon.core:type=Environment,application=" + metadata.getApplicationName() + ",name=griffon");
     }
 }

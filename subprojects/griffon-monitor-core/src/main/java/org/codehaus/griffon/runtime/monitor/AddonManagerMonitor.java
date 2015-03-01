@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.monitor;
+package org.codehaus.griffon.runtime.monitor;
 
 import griffon.core.addon.AddonManager;
 import griffon.core.addon.GriffonAddon;
+import griffon.core.env.Metadata;
 
 import javax.annotation.Nonnull;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author Andres Almiray
  */
-public class AddonManagerMonitor implements AddonManagerMonitorMXBean {
-    private final AddonManager delegate;
+public class AddonManagerMonitor extends AbstractMBeanRegistration implements AddonManagerMonitorMXBean {
+    private AddonManager delegate;
 
-    public AddonManagerMonitor(@Nonnull AddonManager delegate) {
-        this.delegate = delegate;
+    public AddonManagerMonitor(@Nonnull Metadata metadata, @Nonnull AddonManager delegate) {
+        super(metadata);
+        this.delegate = requireNonNull(delegate, "Argument 'delegate' must not be null");
     }
 
     @Override
@@ -51,5 +57,16 @@ public class AddonManagerMonitor implements AddonManagerMonitorMXBean {
             data[i++] = new GriffonAddonInfo(e.getKey());
         }
         return data;
+    }
+
+    @Override
+    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
+        return new ObjectName("griffon.core:type=Manager,application=" + metadata.getApplicationName() + ",name=addon");
+    }
+
+    @Override
+    public void postDeregister() {
+        delegate = null;
+        super.postDeregister();
     }
 }

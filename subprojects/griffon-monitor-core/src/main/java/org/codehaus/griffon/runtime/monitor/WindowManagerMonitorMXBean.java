@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.monitor;
-
-import griffon.core.artifact.ArtifactManager;
-
-import javax.annotation.Nonnull;
+package org.codehaus.griffon.runtime.monitor;
 
 /**
  * @author Andres Almiray
  */
-public class ArtifactManagerMonitor implements ArtifactManagerMonitorMXBean {
-    private final ArtifactManager delegate;
+public interface WindowManagerMonitorMXBean {
+    String getManagerImplementationClass();
 
-    public ArtifactManagerMonitor(@Nonnull ArtifactManager delegate) {
-        this.delegate = delegate;
-    }
-
-    @Override
-    public String getManagerImplementationClass() {
-        return delegate.getClass().getName();
-    }
-
+    int getWindowCount();
 }

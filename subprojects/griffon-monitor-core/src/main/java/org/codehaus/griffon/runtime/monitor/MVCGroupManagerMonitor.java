@@ -13,31 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.monitor;
+package org.codehaus.griffon.runtime.monitor;
 
 import griffon.core.ApplicationEvent;
 import griffon.core.CallableWithArgs;
 import griffon.core.GriffonApplication;
+import griffon.core.env.Metadata;
 import griffon.core.mvc.MVCGroup;
 import griffon.core.mvc.MVCGroupManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
+import javax.management.ObjectName;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * @author Andres Almiray
  */
-public class MVCGroupManagerMonitor implements MVCGroupManagerMonitorMXBean {
-    private final MVCGroupManager delegate;
+public class MVCGroupManagerMonitor extends AbstractMBeanRegistration implements MVCGroupManagerMonitorMXBean {
+    private MVCGroupManager delegate;
     private final NotificationBroadcasterSupport nbs = new NotificationBroadcasterSupport();
     private final AtomicLong sequenceNumber = new AtomicLong(0L);
 
-    public MVCGroupManagerMonitor(@Nonnull GriffonApplication application) {
+    public MVCGroupManagerMonitor(@Nonnull Metadata metadata, @Nonnull GriffonApplication application) {
+        super(metadata);
+        requireNonNull(application, "Argument 'application' must not be null");
         this.delegate = application.getMvcGroupManager();
         application.getEventRouter().addEventListener(ApplicationEvent.CREATE_MVC_GROUP.getName(), new CallableWithArgs<Void>() {
             @Nullable
@@ -106,5 +113,16 @@ public class MVCGroupManagerMonitor implements MVCGroupManagerMonitorMXBean {
             data[i++] = new MVCGroupInfo(group.getMvcType(), group.getMvcId());
         }
         return data;
+    }
+
+    @Override
+    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
+        return new ObjectName("griffon.core:type=Manager,application=" + metadata.getApplicationName() + ",name=mvc");
+    }
+
+    @Override
+    public void postDeregister() {
+        delegate = null;
+        super.postDeregister();
     }
 }

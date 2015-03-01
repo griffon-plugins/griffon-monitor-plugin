@@ -13,23 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.monitor;
+package org.codehaus.griffon.runtime.monitor;
 
 /**
  * @author Andres Almiray
  */
-public interface MVCGroupManagerMonitorMXBean {
+public interface UIThreadManagerMonitorMXBean {
     String getManagerImplementationClass();
-
-    int getMVCGroupCount();
-
-    int getMVCGroupConfigurationCount();
-
-    int getModelCount();
-
-    int getViewCount();
-
-    int getControllerCount();
-
-    MVCGroupInfo[] getMVCGroupDetails();
 }

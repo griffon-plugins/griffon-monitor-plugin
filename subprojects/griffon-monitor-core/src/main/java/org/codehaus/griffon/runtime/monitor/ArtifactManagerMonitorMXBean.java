@@ -13,34 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.monitor;
-
-import griffon.core.env.Metadata;
-
-import javax.annotation.Nonnull;
+package org.codehaus.griffon.runtime.monitor;
 
 /**
  * @author Andres Almiray
  */
-public class MetadataMonitor implements MetadataMonitorMXBean {
-    private final Metadata metadata;
-
-    public MetadataMonitor(@Nonnull Metadata metadata) {
-        this.metadata = metadata;
-    }
-
-    @Override
-    public String getApplicationName() {
-        return metadata.getApplicationName();
-    }
-
-    @Override
-    public String getApplicationVersion() {
-        return metadata.getApplicationVersion();
-    }
-
-    @Override
-    public String getRunningEnvironment() {
-        return metadata.getEnvironment();
-    }
+public interface ArtifactManagerMonitorMXBean {
+    String getManagerImplementationClass();
 }

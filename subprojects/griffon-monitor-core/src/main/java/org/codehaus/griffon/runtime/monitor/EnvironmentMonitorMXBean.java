@@ -13,29 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.monitor;
-
-import griffon.core.view.WindowManager;
-
-import javax.annotation.Nonnull;
+package org.codehaus.griffon.runtime.monitor;
 
 /**
  * @author Andres Almiray
  */
-public class WindowManagerMonitor implements WindowManagerMonitorMXBean {
-    private final WindowManager delegate;
+public interface EnvironmentMonitorMXBean {
+    String getBuildDate();
 
-    public WindowManagerMonitor(@Nonnull WindowManager delegate) {
-        this.delegate = delegate;
-    }
+    String getBuildDateTime();
 
-    @Override
-    public String getManagerImplementationClass() {
-        return delegate.getClass().getName();
-    }
+    String getBuildTime();
 
-    @Override
-    public int getWindowCount() {
-        return delegate.getWindows().size();
-    }
+    String getGriffonVersion();
+
+    String getJvmVersion();
+
+    String getOsVersion();
 }

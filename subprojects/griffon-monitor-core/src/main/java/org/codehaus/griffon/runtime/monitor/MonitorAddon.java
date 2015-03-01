@@ -19,28 +19,25 @@ import griffon.core.ApplicationEvent;
 import griffon.core.CallableWithArgs;
 import griffon.core.GriffonApplication;
 import griffon.core.env.Metadata;
-import griffon.plugins.monitor.ActionManagerMonitor;
-import griffon.plugins.monitor.AddonManagerMonitor;
-import griffon.plugins.monitor.ArtifactManagerMonitor;
-import griffon.plugins.monitor.EnvironmentMonitor;
-import griffon.plugins.monitor.MVCGroupManagerMonitor;
-import griffon.plugins.monitor.MetadataMonitor;
-import griffon.plugins.monitor.UIThreadManagerMonitor;
-import griffon.plugins.monitor.WindowManagerMonitor;
+import griffon.plugins.monitor.MBeanManager;
 import org.codehaus.griffon.runtime.core.addon.AbstractGriffonAddon;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.inject.Named;
-
-import static griffon.util.MXBeanUtils.registerIntoPlatformMBeanServer;
-import static griffon.util.MXBeanUtils.unregisterFromPlatformMBeanServer;
 
 /**
  * @author Andres Almiray
  */
 @Named("monitor")
 public class MonitorAddon extends AbstractGriffonAddon {
+    @Inject
+    private Metadata metadata;
+
+    @Inject
+    private MBeanManager mbeanmanager;
+
     @Override
     public void init(final @Nonnull GriffonApplication application) {
         application.getEventRouter().addEventListener(ApplicationEvent.BOOTSTRAP_END.getName(), new CallableWithArgs<Void>() {
@@ -51,30 +48,17 @@ public class MonitorAddon extends AbstractGriffonAddon {
                 return null;
             }
         });
+        application.addShutdownHandler(mbeanmanager);
     }
 
     private void registerMBeans(@Nonnull GriffonApplication application) {
-        String applicationName = Metadata.getCurrent().getApplicationName();
-        registerIntoPlatformMBeanServer(new EnvironmentMonitor(), "griffon.core:type=Environment,application=" + applicationName + ",name=griffon");
-        registerIntoPlatformMBeanServer(new MetadataMonitor(Metadata.getCurrent()), "griffon.core:type=Environment,application=" + applicationName + ",name=metadata");
-        registerIntoPlatformMBeanServer(new AddonManagerMonitor(application.getAddonManager()), "griffon.core:type=Manager,application=" + applicationName + ",name=addon");
-        registerIntoPlatformMBeanServer(new ArtifactManagerMonitor(application.getArtifactManager()), "griffon.core:type=Manager,application=" + applicationName + ",name=artifact");
-        registerIntoPlatformMBeanServer(new MVCGroupManagerMonitor(application), "griffon.core:type=Manager,application=" + applicationName + ",name=mvc");
-        registerIntoPlatformMBeanServer(new WindowManagerMonitor(application.getWindowManager()), "griffon.core:type=Manager,application=" + applicationName + ",name=window");
-        registerIntoPlatformMBeanServer(new ActionManagerMonitor(application.getActionManager()), "griffon.core:type=Manager,application=" + applicationName + ",name=action");
-        registerIntoPlatformMBeanServer(new UIThreadManagerMonitor(application.getUIThreadManager()), "griffon.core:type=Manager,application=" + applicationName + ",name=thread");
-    }
-
-    @Override
-    public void onShutdown(@Nonnull GriffonApplication application) {
-        String applicationName = Metadata.getCurrent().getApplicationName();
-        unregisterFromPlatformMBeanServer("griffon.core:type=Environment,application=" + applicationName + ",name=griffon");
-        unregisterFromPlatformMBeanServer("griffon.core:type=Environment,application=" + applicationName + ",name=metadata");
-        unregisterFromPlatformMBeanServer("griffon.core:type=Manager,application=" + applicationName + ",name=addon");
-        unregisterFromPlatformMBeanServer("griffon.core:type=Manager,application=" + applicationName + ",name=artifact");
-        unregisterFromPlatformMBeanServer("griffon.core:type=Manager,application=" + applicationName + ",name=mvc");
-        unregisterFromPlatformMBeanServer("griffon.core:type=Manager,application=" + applicationName + ",name=window");
-        unregisterFromPlatformMBeanServer("griffon.core:type=Manager,application=" + applicationName + ",name=action");
-        unregisterFromPlatformMBeanServer("griffon.core:type=Manager,application=" + applicationName + ",name=thread");
+        mbeanmanager.registerMBean(new EnvironmentMonitor(metadata));
+        mbeanmanager.registerMBean(new MetadataMonitor(metadata));
+        mbeanmanager.registerMBean(new AddonManagerMonitor(metadata, application.getAddonManager()));
+        mbeanmanager.registerMBean(new ArtifactManagerMonitor(metadata, application.getArtifactManager()));
+        mbeanmanager.registerMBean(new MVCGroupManagerMonitor(metadata, application));
+        mbeanmanager.registerMBean(new WindowManagerMonitor(metadata, application.getWindowManager()));
+        mbeanmanager.registerMBean(new ActionManagerMonitor(metadata, application.getActionManager()));
+        mbeanmanager.registerMBean(new UIThreadManagerMonitor(metadata, application.getUIThreadManager()));
     }
 }

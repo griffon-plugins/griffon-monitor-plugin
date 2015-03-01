@@ -15,7 +15,6 @@
  */
 package griffon.plugins.monitor
 
-import griffon.core.env.Metadata
 import griffon.core.test.GriffonUnitRule
 import org.junit.Rule
 import spock.lang.Specification
@@ -39,7 +38,7 @@ class MonitorSpec extends Specification {
     @Rule
     public final GriffonUnitRule griffon = new GriffonUnitRule()
 
-    void 'MBEans were exported successfully'() {
+    void 'MBeans were exported successfully'() {
         given:
         MBeanServer mbs = getPlatformMBeanServer()
         JMXServiceURL url = new JMXServiceURL("service:jmx:rmi://")
@@ -52,7 +51,7 @@ class MonitorSpec extends Specification {
         JMXServiceURL addr = cs.getAddress()
         cc = JMXConnectorFactory.connect(addr)
         MBeanServerConnection mbsc = cc.getMBeanServerConnection()
-        ObjectName objectName = new ObjectName("griffon.core:type=Environment,application=${Metadata.getCurrent().getApplicationName()},name=griffon")
+        ObjectName objectName = new ObjectName("griffon.core:type=Environment,application=monitor,name=griffon")
 
         then:
         mbsc.getMBeanInfo(objectName)
