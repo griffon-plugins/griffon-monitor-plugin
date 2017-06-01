@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 package org.codehaus.griffon.runtime.monitor;
 
 import griffon.core.ApplicationEvent;
-import griffon.core.CallableWithArgs;
 import griffon.core.GriffonApplication;
+import griffon.core.RunnableWithArgs;
 import griffon.core.env.Metadata;
 import griffon.plugins.monitor.MBeanManager;
 import org.codehaus.griffon.runtime.core.addon.AbstractGriffonAddon;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -40,12 +39,10 @@ public class MonitorAddon extends AbstractGriffonAddon {
 
     @Override
     public void init(final @Nonnull GriffonApplication application) {
-        application.getEventRouter().addEventListener(ApplicationEvent.BOOTSTRAP_END.getName(), new CallableWithArgs<Void>() {
-            @Nullable
+        application.getEventRouter().addEventListener(ApplicationEvent.BOOTSTRAP_END.getName(), new RunnableWithArgs() {
             @Override
-            public Void call(Object... args) {
+            public void run(Object... args) {
                 registerMBeans(application);
-                return null;
             }
         });
         application.addShutdownHandler(mbeanmanager);

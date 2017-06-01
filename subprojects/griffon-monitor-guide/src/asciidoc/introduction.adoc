@@ -36,3 +36,5 @@ Here's how these beans look when a example application is inspected using JConso
 
 image::jconsole.png[]
 
+Griffon version: {griffon-version}
+

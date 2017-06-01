@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 package org.codehaus.griffon.runtime.monitor;
 
 import griffon.core.ApplicationEvent;
-import griffon.core.CallableWithArgs;
 import griffon.core.GriffonApplication;
+import griffon.core.RunnableWithArgs;
 import griffon.core.env.Metadata;
 import griffon.core.mvc.MVCGroup;
 import griffon.core.mvc.MVCGroupManager;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
@@ -46,20 +45,16 @@ public class MVCGroupManagerMonitor extends AbstractMBeanRegistration implements
         super(metadata);
         requireNonNull(application, "Argument 'application' must not be null");
         this.delegate = application.getMvcGroupManager();
-        application.getEventRouter().addEventListener(ApplicationEvent.CREATE_MVC_GROUP.getName(), new CallableWithArgs<Void>() {
-            @Nullable
+        application.getEventRouter().addEventListener(ApplicationEvent.CREATE_MVC_GROUP.getName(), new RunnableWithArgs() {
             @Override
-            public Void call(Object... args) {
+            public void run(Object... args) {
                 fireNotification(ApplicationEvent.CREATE_MVC_GROUP.getName(), (MVCGroup) args[0]);
-                return null;
             }
         });
-        application.getEventRouter().addEventListener(ApplicationEvent.DESTROY_MVC_GROUP.getName(), new CallableWithArgs<Void>() {
-            @Nullable
+        application.getEventRouter().addEventListener(ApplicationEvent.DESTROY_MVC_GROUP.getName(), new RunnableWithArgs() {
             @Override
-            public Void call(Object... args) {
+            public void run(Object... args) {
                 fireNotification(ApplicationEvent.DESTROY_MVC_GROUP.getName(), (MVCGroup) args[0]);
-                return null;
             }
         });
     }
