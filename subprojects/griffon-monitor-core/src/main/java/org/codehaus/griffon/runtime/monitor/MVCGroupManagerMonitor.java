@@ -1,11 +1,13 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2017-2020 The author and/or original authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,14 +17,16 @@
  */
 package org.codehaus.griffon.runtime.monitor;
 
+import griffon.annotations.core.Nonnull;
 import griffon.core.ApplicationEvent;
 import griffon.core.GriffonApplication;
-import griffon.core.RunnableWithArgs;
 import griffon.core.env.Metadata;
+import griffon.core.events.CreateMVCGroupEvent;
+import griffon.core.events.DestroyMVCGroupEvent;
 import griffon.core.mvc.MVCGroup;
 import griffon.core.mvc.MVCGroupManager;
 
-import javax.annotation.Nonnull;
+import javax.application.event.EventHandler;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
@@ -37,26 +41,25 @@ import static java.util.Objects.requireNonNull;
  * @author Andres Almiray
  */
 public class MVCGroupManagerMonitor extends AbstractMBeanRegistration implements MVCGroupManagerMonitorMXBean {
-    private MVCGroupManager delegate;
     private final NotificationBroadcasterSupport nbs = new NotificationBroadcasterSupport();
     private final AtomicLong sequenceNumber = new AtomicLong(0L);
+    private MVCGroupManager delegate;
 
     public MVCGroupManagerMonitor(@Nonnull Metadata metadata, @Nonnull GriffonApplication application) {
         super(metadata);
         requireNonNull(application, "Argument 'application' must not be null");
         this.delegate = application.getMvcGroupManager();
-        application.getEventRouter().addEventListener(ApplicationEvent.CREATE_MVC_GROUP.getName(), new RunnableWithArgs() {
-            @Override
-            public void run(Object... args) {
-                fireNotification(ApplicationEvent.CREATE_MVC_GROUP.getName(), (MVCGroup) args[0]);
-            }
-        });
-        application.getEventRouter().addEventListener(ApplicationEvent.DESTROY_MVC_GROUP.getName(), new RunnableWithArgs() {
-            @Override
-            public void run(Object... args) {
-                fireNotification(ApplicationEvent.DESTROY_MVC_GROUP.getName(), (MVCGroup) args[0]);
-            }
-        });
+        application.getEventRouter().subscribe(this);
+    }
+
+    @EventHandler
+    public void handleCreateMVCGroupEvent(@Nonnull CreateMVCGroupEvent event) {
+        fireNotification(ApplicationEvent.CREATE_MVC_GROUP.getName(), event.getGroup());
+    }
+
+    @EventHandler
+    public void handleDestroyMVCGroupEvent(@Nonnull DestroyMVCGroupEvent event) {
+        fireNotification(ApplicationEvent.DESTROY_MVC_GROUP.getName(), event.getGroup());
     }
 
     private void fireNotification(@Nonnull String event, @Nonnull MVCGroup group) {

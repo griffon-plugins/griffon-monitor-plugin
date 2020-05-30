@@ -15,21 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.codehaus.griffon.runtime.monitor;
 
-/**
- * @author Andres Almiray
- */
-public interface EnvironmentMonitorMXBean {
-    String getBuildDate();
+ext.projectDependencies = [
+    ':griffon-monitor-core'
+]
 
-    String getBuildDateTime();
-
-    String getBuildTime();
-
-    String getGriffonVersion();
-
-    String getJvmVersion();
-
-    String getOsVersion();
-}
+ext.projectDependencies.each { evaluationDependsOn it }

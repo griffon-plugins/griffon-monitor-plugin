@@ -1,11 +1,13 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2017-2020 The author and/or original authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,14 +17,14 @@
  */
 package org.codehaus.griffon.runtime.monitor;
 
-import griffon.core.ApplicationEvent;
+import griffon.annotations.core.Nonnull;
 import griffon.core.GriffonApplication;
-import griffon.core.RunnableWithArgs;
 import griffon.core.env.Metadata;
+import griffon.core.events.BootstrapEndEvent;
 import griffon.plugins.monitor.MBeanManager;
 import org.codehaus.griffon.runtime.core.addon.AbstractGriffonAddon;
 
-import javax.annotation.Nonnull;
+import javax.application.event.EventHandler;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -39,16 +41,13 @@ public class MonitorAddon extends AbstractGriffonAddon {
 
     @Override
     public void init(final @Nonnull GriffonApplication application) {
-        application.getEventRouter().addEventListener(ApplicationEvent.BOOTSTRAP_END.getName(), new RunnableWithArgs() {
-            @Override
-            public void run(Object... args) {
-                registerMBeans(application);
-            }
-        });
+        application.getEventRouter().subscribe(this);
         application.addShutdownHandler(mbeanmanager);
     }
 
-    private void registerMBeans(@Nonnull GriffonApplication application) {
+    @EventHandler
+    public void handleBootstrapEndEven(@Nonnull BootstrapEndEvent event) {
+        GriffonApplication application = event.getApplication();
         mbeanmanager.registerMBean(new EnvironmentMonitor(metadata));
         mbeanmanager.registerMBean(new MetadataMonitor(metadata));
         mbeanmanager.registerMBean(new AddonManagerMonitor(metadata, application.getAddonManager()));

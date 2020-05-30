@@ -1,11 +1,13 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2017-2020 The author and/or original authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,19 +17,18 @@
  */
 package org.codehaus.griffon.runtime.monitor;
 
+import griffon.annotations.core.Nonnull;
 import griffon.core.GriffonApplication;
 import griffon.plugins.monitor.MBeanManager;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.GuardedBy;
 import javax.management.MBeanRegistration;
 import javax.management.ObjectName;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static griffon.util.GriffonNameUtils.requireNonBlank;
-import static griffon.util.MXBeanUtils.registerIntoPlatformMBeanServer;
-import static griffon.util.MXBeanUtils.unregisterFromPlatformMBeanServer;
+import static griffon.util.monitor.MXBeanUtils.registerIntoPlatformMBeanServer;
+import static griffon.util.monitor.MXBeanUtils.unregisterFromPlatformMBeanServer;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -39,10 +40,9 @@ public class DefaultMBeanManager implements MBeanManager {
     private static final String ERROR_OBJECT_NAME_BLANK = "Argument 'objectName' must not be blank";
 
     private final Object lock = new Object[0];
-    @GuardedBy("lock")
-    private boolean enabled;
-
     private final Map<String, ObjectName> objectNames = new ConcurrentHashMap<>();
+    // @GuardedBy("lock")
+    private boolean enabled;
 
     @Override
     public boolean isEnabled() {
