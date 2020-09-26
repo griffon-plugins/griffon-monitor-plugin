@@ -17,15 +17,7 @@
  */
 config {
     info {
-        name          = projectDescription
-        description   = projectDescription
         inceptionYear = '2017'
         tags          = ['griffon', 'plugin', 'jmx']
-    }
-
-    coverage {
-        jacoco {
-            toolVersion = jacocoVersion
-        }
     }
 }
